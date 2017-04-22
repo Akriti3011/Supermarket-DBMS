@@ -1,3 +1,4 @@
+Supermarket Database Management System
 
 PROJECT OBJECTIVE:
 
