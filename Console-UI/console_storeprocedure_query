@@ -1,0 +1,1040 @@
+#include<stdio.h>
+#include<string.h>
+#include<stdlib.h>
+#include "sqlca.h"
+EXEC SQL INCLUDE sqlca;
+EXEC SQL BEGIN DECLARE SECTION;
+
+typedef struct{
+char emp_id[20];
+char emp_name[20];
+int emp_cont ;          
+char emp_dob[20];
+char emp_email[50];
+char emp_address[50] ;
+char emp_gender[10];
+}emp_record;
+
+typedef struct{
+char off_id[50] ;
+char off_type[50];
+char off_details[50];
+char off_start[20];
+char off_end[20] ;
+}offer_record;
+
+typedef struct{
+char type_id[10];
+char type_name[20];
+}custp_record;
+
+typedef struct{
+char cus_id[20];
+char cus_name[20];
+int cus_cont ;          
+char cus_dob[20];
+char cus_email[50];
+char cus_address[50];
+char cus_gender[10];
+char custy_id[6];
+char mem_to[20] ;
+char mem_from[20] ;
+}cust_record;
+
+
+typedef struct{
+char ware_no[20] ;
+char ware_name[50];
+}ware_record;
+
+
+typedef struct{
+char bl_id[20];
+char bl_name[50];
+char bl_incharge[50];
+}block_record;
+
+typedef struct{
+ char cat_id[10];
+ char cat_name[50];
+ char st_id[2];
+ char war_no[20];
+}category_record;
+
+typedef struct{
+ char pay_id[30];
+ char mode_pay[20];
+ char off_id[50];
+}pay_record;
+
+typedef struct{
+ char inv_id[20] ;
+ char cust_id[20];
+ float  amount;
+ char inv_date[20];
+ char pay_mode[6];
+ char cas_id[10];
+}inv_record;
+
+typedef struct{
+ char pro_id[20];
+ char pro_ty[50];
+ char brand[20];
+ float cost;
+ char weight[20];
+ float sell;
+ char cat_id[6];
+ char off_id[50];
+ int blo_count;
+ int war_count;
+}pro_record;
+
+
+typedef struct{
+char pro_id[20];
+char inv_id[20];
+int quantity;
+float cost;
+}buy_record;
+
+
+typedef struct{
+char rev_id[20];
+char rev_text[100];
+int rating;
+char review_date[20];
+char cust_id[20];
+char invoice_id[20];
+}feed_record;
+
+typedef struct{
+ char slip_no[20]; 
+ char inv_id[20];
+ char product_id[20];
+ int  quantity;
+ char return_date[20];
+}returns;
+
+EXEC SQL END DECLARE SECTION;
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void insert_customer()
+{
+printf("Enter the details of the new customer\n");
+EXEC SQL BEGIN DECLARE SECTION;
+cust_record cus;
+EXEC SQL END DECLARE SECTION;
+
+printf("\nEnter Contact: ");
+scanf("%d",&cus.cus_cont);
+
+if(chkphn==1)
+{
+
+printf("\nEnter Customer ID:  ");
+scanf("%s",cus.cus_id);
+
+
+printf("\nEnter Customer Name: ");
+scanf("%s",cus.cus_name);
+
+printf("\nEnter date of birth: ");
+scanf("%s",cus.cus_dob);
+
+printf("\nEnter Customer email: ");
+scanf("%s",cus.cus_email);
+
+printf("\nEnter Customer address: ");
+scanf("%s",cus.cus_address);
+
+printf("\nEnter Customer gender: ");
+scanf("%s",cus.cus_gender);
+
+printf("\nEnter Customer type ID: ");
+scanf("%s",cus.custy_id);
+
+printf("\nEnter membership date to: ");
+scanf("%s",cus.mem_to);
+
+printf("\nEnter membership date from ");
+scanf("%s",cus.mem_from);
+
+EXEC SQL insert into Customer values(:cus.cus_id,:cus.cus_name,:cus.cus_cont,:cus.cus_dob,
+:cus.cus_email,:cus.cus_address,:cus.cus_gender,:cus.custy_id,
+:cus.mem_to,:cus.mem_from);
+
+
+if (sqlca.sqlcode < 0) {
+printf("\n\nCustomer (%s) DID NOT GET ADDED\n",cus.cus_name);
+
+return;
+}
+else 
+printf("\n New Customer Added Succesfully\n");
+EXEC SQL COMMIT;
+}
+else
+{
+ pr
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+void insert_product()
+{
+
+printf("Enter the details of the new product\n");
+EXEC SQL BEGIN DECLARE SECTION;
+//int Product_ID;
+pro_record pro;
+EXEC SQL END DECLARE SECTION;
+printf("\nProduct ID:  ");
+scanf("%s",&pro.pro_id);
+getchar();
+printf("\nProduct type: ");
+scanf("%s",&pro.pro_ty);
+getchar();
+printf("\nBrand : ");
+scanf("%s",&pro.brand);
+getchar();
+printf("\nEnter cost price: ");
+scanf("%f",&pro.cost);
+printf("\nWeight: ");
+scanf("%s",&pro.weight);
+getchar();
+printf("\nEnter sell price: ");
+scanf("%f",&pro.sell);
+printf("\n Category ID: ");
+scanf("%s",&pro.cat_id);
+getchar();
+printf("\nOffer ID: ");
+scanf("%s",&pro.off_id);
+getchar();
+printf("\nBlock count: ");
+scanf("%d",&pro.blo_count);
+printf("\nWarehouse count: ");
+scanf("%d",&pro.war_count);
+
+EXEC SQL INSERT into Product values(:pro.pro_id,:pro.pro_ty,:pro.brand,:pro.cost,:pro.weight,:pro.sell,
+:pro.cat_id,pro.off_id,:pro.blo_count,:pro.war_count);
+
+if (sqlca.sqlcode==0) {
+printf("\n\nPRODUCT (%s) DID NOT GET ADDED\n",pro.pro_id);
+EXEC SQL rollback work;
+return;
+}
+else 
+printf("\n New Product Added Succesfully\n");
+EXEC SQL commit;
+}
+ 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void insert_buys()
+{
+
+printf("Enter the details of the new buys:\n");
+EXEC SQL BEGIN DECLARE SECTION;
+int sum=0,costs;
+buy_record by;
+inv_record inv;
+char ch;
+int chk=-1;
+EXEC SQL END DECLARE SECTION;
+
+printf("\nEnter Invoice ID:  ");
+scanf("%s",&by.inv_id);
+getchar();
+printf("\nEnter Customer ID: ");
+scanf("%s",&inv.cust_id);
+getchar();
+printf("\nEnter Date: ");
+scanf("%s",&inv.inv_date);
+getchar();
+printf("\nEnter PaymentMode ID: ");
+scanf("%s",&inv.pay_mode);
+getchar();
+
+do
+{
+   printf("\nEnter Product ID:  ");
+   scanf("%s",&by.pro_id);
+   EXEC SQL SELECT check_product(:by.pro_id) into :chk;	
+   if(chk==1)
+   {
+   	  printf("\nEnter Quantity : ");
+          scanf("%d",&by.quantity);
+
+        EXEC SQL SELECT cost_price into :costs
+        FROM Product
+        WHERE Product_ID = :by.pro_id;
+        by.cost=costs;
+        sum=sum+costs;
+   }
+   else
+   {
+   	  printf("Product doesnot exist\n");
+   }
+   printf("Do you want to exit?\n");
+   scanf("%c",ch);
+}
+while(ch!='n');
+
+inv.amount= sum;
+
+
+EXEC SQL insert into Buys values(:by.inv_id,:by.pro_id,:by.quantity,:by.cost);
+EXEC SQL insert into InvoiceDetails values(:inv.inv_id,:inv.cust_id,:inv.amount,:inv.inv_date,:inv.pay_mode, :inv.cas_id);
+if (sqlca.sqlcode < 0) {
+printf("\n\nBuys (%d) DID NOT GET ADDED\n",by.inv_id);
+EXEC SQL rollback work;
+return;
+}
+else 
+printf("\n New Buys details Added Succesfully\n");
+EXEC SQL commit;
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+void print_employee()
+{
+EXEC SQL BEGIN DECLARE SECTION;
+emp_record custs;
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE showOH1 CURSOR FOR SELECT * FROM Employee ;
+EXEC SQL OPEN showOH1;
+while(sqlca.sqlcode==0)
+{
+EXEC SQL FETCH showOH1 INTO :custs.emp_id, :custs.emp_name, :custs.emp_cont, :custs.emp_dob, :custs.emp_email, :custs.emp_address, :custs.emp_gender;
+printf("%s\t %s\t %d\t %s\t %s\t %s\t %s\n",custs.emp_id,custs.emp_name,custs.emp_cont,custs.emp_dob,custs.emp_email,custs.emp_address,custs.emp_gender);
+}
+
+
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void print_offer()
+{
+EXEC SQL BEGIN DECLARE SECTION;
+offer_record custs;
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE showOH2 CURSOR FOR SELECT * FROM OfferDetails ;
+EXEC SQL OPEN showOH2;
+while(sqlca.sqlcode==0)
+{
+EXEC SQL FETCH showOH2 INTO :custs.off_id , :custs.off_type, :custs.off_details, :custs.off_start, :custs.off_end ;
+printf("%s\t %s\t %s\t %s\n",custs.off_id ,custs.off_type,custs.off_details,custs.off_start,custs.off_end);
+}
+
+
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void print_customertype()
+{
+EXEC SQL BEGIN DECLARE SECTION;
+custp_record custs;
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE showOH3 CURSOR FOR SELECT * FROM CustomerType;
+EXEC SQL OPEN showOH3;
+printf("shweta");
+while(sqlca.sqlcode==0)
+{
+EXEC SQL FETCH NEXT showOH3 INTO :custs.type_id, :custs.type_name;
+printf("%s\t %s\n",custs.type_id,custs.type_name);
+}
+
+
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void print_warehouse()
+{
+EXEC SQL BEGIN DECLARE SECTION;
+ware_record custs;
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE showOH4 CURSOR FOR SELECT * FROM Warehouse;
+EXEC SQL OPEN showOH4;
+
+
+while(sqlca.sqlcode==0)
+{
+
+EXEC SQL FETCH NEXT showOH4 INTO :custs.ware_no, :custs.ware_name;
+printf("%s\t %s\n",custs.ware_no,custs.ware_name);
+}
+
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void print_block()
+{
+EXEC SQL BEGIN DECLARE SECTION;
+block_record custs;
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE showOH5 CURSOR FOR SELECT * FROM Block ;
+
+EXEC SQL OPEN showOH5;
+while(sqlca.sqlcode==0)
+{
+EXEC SQL FETCH NEXT showOH5 INTO :custs.bl_id, :custs.bl_name, :custs.bl_incharge;
+printf("%s\t %s\t %s\n",custs.bl_id,custs.bl_name,custs.bl_incharge);
+}
+
+
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void print_category()
+{
+EXEC SQL BEGIN DECLARE SECTION;
+category_record custs;
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE showOH6 CURSOR FOR SELECT * FROM Category ;
+EXEC SQL OPEN showOH6;
+while(sqlca.sqlcode==0)
+{
+EXEC SQL FETCH NEXT showOH6 INTO :custs.cat_id, :custs.cat_name, :custs.st_id, :custs.war_no;
+printf("%s\t %s\t %s\t %s\n",custs.cat_id,custs.cat_name,custs.st_id,custs.war_no);
+}
+
+
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void print_paymentmode()
+{
+EXEC SQL BEGIN DECLARE SECTION;
+pay_record custs;
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE showOH7 CURSOR FOR SELECT * FROM PaymentMode ;
+EXEC SQL OPEN showOH7;
+while(sqlca.sqlcode==0)
+{
+EXEC SQL FETCH NEXT showOH7 INTO :custs.pay_id, :custs.mode_pay, :custs.off_id;
+printf("%s\t %s\t %s\n",custs.pay_id,custs.mode_pay,custs.off_id);
+}
+
+
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void print_invoicedetails()
+{
+EXEC SQL BEGIN DECLARE SECTION;
+inv_record custs;
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE showOH8 CURSOR FOR SELECT * FROM InvoiceDetails ;
+EXEC SQL OPEN showOH8;
+while(sqlca.sqlcode==0)
+{
+EXEC SQL FETCH showOH8 INTO :custs.inv_id, :custs.cust_id, :custs.amount, :custs.inv_date, :custs.pay_mode,:custs.cas_id;
+printf("%s\t %s\t %d\t %s\t %s\t %s\t %s\n",custs.inv_id,custs.cust_id,custs.amount,custs.inv_date,custs.pay_mode,custs.cas_id);
+}
+
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void print_buyss()
+{
+EXEC SQL BEGIN DECLARE SECTION;
+buy_record custs;
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE showOH9 CURSOR FOR SELECT * FROM Buys;
+EXEC SQL OPEN showOH9;
+while(sqlca.sqlcode==0)
+{
+EXEC SQL FETCH showOH9 INTO :custs.pro_id, :custs.inv_id, :custs.quantity,:custs.cost;
+printf("%s\t %s\t %d\t %d\n",custs.pro_id,custs.inv_id,custs.quantity,custs.cost);
+}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void print_feedback()
+{
+EXEC SQL BEGIN DECLARE SECTION;
+feed_record custs;
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE showOH10 CURSOR FOR SELECT *  FROM Feedback ;
+EXEC SQL OPEN showOH10;
+while(sqlca.sqlcode==0)
+{
+EXEC SQL FETCH showOH10 INTO :custs.rev_id, :custs.rev_text, :custs.rating, :custs.review_date, :custs.cust_id, :custs.invoice_id;
+printf("%s\t %s\t %d\t %s\t %s\t %s\n",custs.rev_text,custs.rating,custs.review_date,custs.cust_id,custs.invoice_id);
+}
+
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+void print_products()
+{
+EXEC SQL BEGIN DECLARE SECTION;
+pro_record custs;
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE showOH11 CURSOR FOR SELECT * FROM Product ;
+EXEC SQL OPEN showOH11;
+while(sqlca.sqlcode==0)
+{
+EXEC SQL FETCH showOH11 INTO :custs.pro_id, :custs.pro_ty, :custs.brand, :custs.cost, :custs.weight, :custs.sell,
+ :custs.cat_id,:custs.off_id,:custs.blo_count,:custs.war_count;
+printf("%s\t %s\t %s\t %f\t %s\t %f\t %s\t %s\t %d\t %d\n",custs.pro_id, custs.pro_ty, custs.brand, custs.cost, custs.weight, custs.sell,custs.cat_id,custs.off_id,custs.blo_count,custs.war_count);
+}
+
+
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void print_customers()
+{
+EXEC SQL BEGIN DECLARE SECTION;
+cust_record custs;
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE showOH12 CURSOR FOR SELECT * FROM customer ;
+EXEC SQL OPEN showOH12;
+while(sqlca.sqlcode==0)
+{
+EXEC SQL FETCH showOH12  INTO :custs.cus_id, :custs.cus_name, :custs.cus_cont, :custs.cus_dob, :custs.cus_email, :custs.cus_address, :custs.cus_gender,:custs.custy_id,:custs.mem_to,:custs.mem_from;
+
+printf("%s\t %s\t %d\t %s\t %s\t %s\t %s\t %s\t %s\t %s\n",custs.cus_id, custs.cus_name, custs.cus_cont, custs.cus_dob, custs.cus_email, custs.cus_address, custs.cus_gender,custs.custy_id,custs.mem_to,custs.mem_from);
+}
+
+
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void print_returns()
+{
+EXEC SQL BEGIN DECLARE SECTION;
+returns custs;
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE showOH13 CURSOR FOR SELECT * FROM return_slip ;
+EXEC SQL OPEN showOH13;
+while(sqlca.sqlcode==0)
+{
+EXEC SQL FETCH showOH13 INTO :custs.slip_no,:custs.inv_id,:custs.product_id,:custs.quantity,:custs.return_date;
+
+printf("%s\t %s\t %s\t %d\t %s\n",custs.slip_no,custs.inv_id,custs.product_id,
+custs.quantity,custs.return_date);
+}
+
+
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void query1()
+{
+	EXEC SQL BEGIN DECLARE SECTION;
+	int c;
+	EXEC SQL END DECLARE SECTION;
+   
+ 
+    EXEC SQL select count(distinct cust_id) INTO :c from invoicedetails natural join customer natural join customertype 
+where invoicedetails.amount > 2000 and customertype.type_name='Platinum';
+
+     printf("count: %d\n",c);
+    
+}
+
+
+////////
+
+void query2()
+{
+
+	EXEC SQL BEGIN DECLARE SECTION;
+	char product_id [20],product1_id [20],product_type[50],brand[20],category_id[6],offer_id[50];
+	int block_count,warehouse_count;
+	int cost_price,weight,selling_price;
+
+	EXEC SQL END DECLARE SECTION;
+   
+ 
+    EXEC SQL DECLARE emp_cur1 CURSOR  FOR   select * from (select DISTINCT product_id from (select inv_id from 
+                          InvoiceDetails as i join PaymentMode as p on (i.payment_mode_id=p.payment_mode_id)
+                          where mode_of_payment='Paytm')as d join Buys as b on(d.inv_id=b.invoice_id)) as s 
+                          join Product as pro on(s.product_id=pro.product_id) where offer_id='KHUSIWALIDIWALI';
+
+    EXEC SQL OPEN emp_cur1;
+    while(sqlca.sqlcode==0)
+    {
+       EXEC SQL FETCH emp_cur1 INTO :product_id, :product1_id, :product_type, :brand, :cost_price,  :weight, :selling_price, :category_id, :offer_id,    :block_count, :warehouse_count;
+ 
+       printf("%s\t %s\t %s\t %s\t %d\t %d\t %d\t %s\t %s\t %d\t %d\n",product_id,product1_id,product_type,brand,cost_price,weight, selling_price,category_id,offer_id,block_count,warehouse_count);
+    }
+   
+    
+}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+void query3()
+{
+   	EXEC SQL BEGIN DECLARE SECTION;
+	char product_id [20],invoice_id [20], category_id[20];
+	EXEC SQL END DECLARE SECTION;
+    
+
+    EXEC SQL DECLARE emp_cur2 CURSOR  FOR select distinct product_id , product_type,category_id from buys natural join product natural join category where
+    category.warehouse_no like '%002' and
+    product.category_id like 'MF%';
+    EXEC SQL OPEN emp_cur2;
+    while(sqlca.sqlcode==0)
+    {
+       EXEC SQL FETCH emp_cur2 INTO :product_id, :invoice_id, :category_id;
+       printf("%s\t %s\t %s\n",product_id,invoice_id,category_id);
+    }
+   
+    
+}
+/////
+
+void  query4()
+{
+EXEC SQL BEGIN DECLARE SECTION;
+char offers_id[20],offers_type[20],offers_details[20];
+ 
+EXEC SQL END DECLARE SECTION;
+   
+    
+    EXEC SQL DECLARE emp_cur3 CURSOR  FOR select offers_id,offers_type,offers_details from OfferDetails 
+                            where offers_start_date < '2016-12-31' and offers_end_date > '2016-12-31';
+    EXEC SQL OPEN emp_cur3;
+    while(sqlca.sqlcode==0)
+    {
+       EXEC SQL FETCH emp_cur3 INTO :offers_id, :offers_type, :offers_details;
+       printf("%s\t\t   %s\t\t %s\n",offers_id,offers_type,offers_details);
+    }
+   
+   
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void query5()
+{
+   EXEC SQL BEGIN DECLARE SECTION;
+char employee_name[20],employee_id[20],gender[20];
+EXEC SQL END DECLARE SECTION;
+
+    
+    EXEC SQL DECLARE emp_cur4 CURSOR  FOR  select employee_name, employee_id ,gender from (select DISTINCT block_incharge_id from block except
+                                         select DISTINCT  block_incharge_id from (select  DISTINCT store_id from (select distinct category_id from 
+                                         ReturnSlip as rs join Product as p on(rs.product_id=p.product_id))as e join category as
+                                         c on(e.category_id=c.category_id))as f join block as b on (f.store_id=b.block_id))as bl join
+                                         employee as emp  on(bl.block_incharge_id=emp.employee_id);
+ 
+    EXEC SQL OPEN emp_cur4;
+    while(sqlca.sqlcode==0)
+    {
+       EXEC SQL FETCH emp_cur4 INTO :employee_name, :employee_id, :gender;
+       printf("%s\t %s\t %d\n",employee_name,employee_id,gender);
+    }
+
+    
+}
+
+////////////////////////////////
+
+
+
+
+
+
+
+
+
+////
+
+void query6()
+{
+   EXEC SQL BEGIN DECLARE SECTION;
+char product_id [20],product_type [20];
+int warehouse_count,block_count;
+EXEC SQL END DECLARE SECTION;
+ 
+    EXEC SQL DECLARE emp_cur5 CURSOR  FOR  select  p.product_id,p.product_type,p.warehouse_count,p.block_count from returnslip as r join
+                                      Product as p on(r.product_id=p.product_id) where block_count > 0.3 * warehouse_count; 
+ 
+    EXEC SQL OPEN emp_cur5;
+    while(sqlca.sqlcode==0)
+    {
+       EXEC SQL FETCH emp_cur5 INTO :product_id, :product_type, :warehouse_count, :block_count;
+       printf("%s\t %s\t %d\n",product_id,product_type,warehouse_count,block_count);
+    }
+   
+    
+}
+
+/////
+
+void query7()
+{
+   	EXEC SQL BEGIN DECLARE SECTION;
+	char product_id [20],invoice_id [20];
+	int quantity;
+
+	EXEC SQL END DECLARE SECTION;
+    
+    EXEC SQL DECLARE emp_cur6 CURSOR  FOR select distinct cust_id,type_name from(select DISTINCT cust_id , inv_date ,amount from (select invoice_id ,sum(quantity) from Buys group by invoice_id having sum(quantity)>3 or sum(quantity)=3)
+    as p natural join InvoiceDetails where amount >3000 and inv_date='2015-03-05' )as j natural join Customer as c natural join 
+     CustomerType where CustomerType.type_name='Platinum';
+
+    EXEC SQL OPEN emp_cur6;
+    while(sqlca.sqlcode==0)
+    {
+       EXEC SQL FETCH emp_cur6 INTO :product_id, :invoice_id, :quantity;
+       printf("%s\t %s\t %d\n",product_id,invoice_id,quantity);
+    }
+   
+    
+}
+/////
+
+////////////
+void query8()
+{
+   	EXEC SQL BEGIN DECLARE SECTION;
+	char product_id [20];
+	int c;
+
+	EXEC SQL END DECLARE SECTION;
+    
+    EXEC SQL DECLARE emp_cur14 CURSOR  FOR select product_id, count(product_id) INTO :c  from buys natural join product 
+                            where offer_id='OFF10'
+                   group by product_id order by sum(quantity) desc ;  
+
+    EXEC SQL OPEN emp_cur14;
+
+    while(sqlca.sqlcode==0)
+    {
+        
+       EXEC SQL FETCH emp_cur14 INTO :product_id;
+printf("%d",c);
+       printf("%s\n",product_id);
+    }
+   
+    
+}
+
+void query9()
+{
+       EXEC SQL BEGIN DECLARE SECTION;
+    char employee_id[20],employee_name[20];
+    EXEC SQL END DECLARE SECTION;
+    
+
+    EXEC SQL DECLARE emp_cur15 CURSOR  FOR 
+select  distinct employee_name,employee_id from employee inner join block on(employee_id=block_incharge_id) 
+inner join category on (block_id=store_id) where block_name='Grocery';
+    EXEC SQL OPEN emp_cur15;
+    while(sqlca.sqlcode==0)
+    {
+       EXEC SQL FETCH emp_cur15 INTO :employee_id, :employee_name;
+       printf("%s\t %s\n",employee_id,employee_name);
+    }
+   
+    
+}
+
+void query10()
+{
+       EXEC SQL BEGIN DECLARE SECTION;
+    char offer_id[20];
+	int c;
+    EXEC SQL END DECLARE SECTION;
+    
+
+    EXEC SQL DECLARE emp_cur16 CURSOR  FOR 
+select offer_id,max INTO :c from
+(select offer_id ,sum(quantity) as max from returnslip natural join product group by offer_id) as r2
+natural join
+(select max(sum) as max from (select sum(quantity) as sum,offer_id from returnslip natural join product group by offer_id) 
+as r1) as r3 where r3.max=r2.max;
+    EXEC SQL OPEN emp_cur16;
+  
+    while(sqlca.sqlcode==0)
+    {
+       EXEC SQL FETCH emp_cur16 INTO :offer_id,:c;
+        printf("%s\n",offer_id);
+        printf("%d\t",c);
+    }
+   
+    
+}
+
+
+
+void main_print()
+{
+int insert_choice;
+printf("Enter the type of a new Entry\n");
+printf("1. employee\n");
+printf("2. offer\n");
+printf("3. invoicedetails\n");
+printf("4. customertype\n");
+printf("5. warehouse\n");
+printf("6. block\n");
+printf("7. category\n");
+printf("8. paymentmode\n");
+printf("9. buys\n");
+printf("10. feedback\n");
+printf("11. returns\n");
+printf("12. Customer\n");
+printf("13. product\n");
+printf("14. Exit\n");
+printf("Enter your choice:  ");
+scanf("%d",&insert_choice);
+switch(insert_choice)
+{
+case 1:
+print_employee();
+break;
+case 2:
+print_offer();
+break;
+case 3:
+print_invoicedetails();
+break;
+case 4:
+print_customertype();
+break;
+case 5:
+print_warehouse();
+break;
+case 6:
+print_block();
+break;
+case 7:
+print_category();
+break;
+case 8:
+print_paymentmode();
+break;
+case 9:
+print_buyss();
+break;
+case 10:
+print_feedback();
+break;
+case 11:
+print_returns();
+break;
+case 12:
+print_customers();
+break;
+case 13:
+print_products();
+break;
+case 14:
+return;
+case 15:
+EXEC SQL COMMIT;
+EXEC SQL DISCONNECT;
+exit(0);
+}
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+void main_insert()
+{
+int insert_choice;
+printf("Enter the type of a new Entry\n");
+printf("1. Customer\n");
+printf("2. buys\n");
+printf("3. invoicedetails\n");
+printf("4. Back to main menu\n");
+printf("5. Exit\n");
+printf("Enter your choice:  ");
+scanf("%d",&insert_choice);
+switch(insert_choice)
+{
+case 1:
+insert_customer();
+break;
+
+case 2:
+insert_product();
+break;
+case 3:
+insert_buys();
+break;
+case 4:
+return;
+case 5:
+EXEC SQL COMMIT;
+EXEC SQL DISCONNECT;
+exit(0);
+}
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void main_menu()
+{
+printf("\n\n");
+printf("*********************************************************\n");
+printf("E-Commerce Database Management System\n");
+printf("Please select an option:\n");
+printf("<1> Insert a new Entry\n");
+printf("<2> Print table for table\n");
+printf("<3> no. of platinum card holder who shopped for more than rs 20000\n");
+printf("<4> LIST DETAILS OF PRODUCT which are brought through mode_of_payment is Paytm and conatined offer_id is KHUSIWALIDILWALI\n");
+printf("<5> list details of product sold whose category id begins with MF and stored in warehouse ending with 002\n");
+printf("<6> if someone shops on 2017-12-31 list all offers on that day\n");
+printf("<7> list incahrge name , incharge id and gender of block incharge whose product was never returned\n");
+printf("<8> list product id, product type, warehouse count and block count of products which were returned and whose block count is 30 % greater than warehouse count\n");
+printf("<9> Select customer id who have buyed more than 3 quantity product and purchasing amount > 3000  on 2015-03-05\n");
+printf("<10>  list product id and quantity of products sold under offer OFF10 \n");
+printf("<11> Exit\n");
+printf("*********************************************************\n");
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+int main()
+{
+
+  EXEC SQL CONNECT TO "201552076@10.100.1.62" USER "201552076" USING "201552076";
+    
+    EXEC SQL set search_path to walmart;
+
+int main_choice;
+X:
+main_menu();
+printf("\nEnter your choice (eg. 1 for 1st choice):  ");
+scanf("%d",&main_choice);
+switch(main_choice)
+{
+case 1:
+main_insert();
+break;
+case 2:
+main_print();
+break;
+case 3:
+query1();
+break;
+case 4:
+query2();
+break;
+case 5:
+query3();
+break;
+case 6:
+query4();
+break;
+case 7:
+query5();
+break;
+case 8:
+query6();
+break;
+case 9:
+query7();
+break;
+case 10:
+query8();
+break;
+case 11:
+query9();
+break;
+case 12:
+query10();
+break;
+case 13:
+EXEC SQL COMMIT;
+EXEC SQL DISCONNECT;
+exit(0);
+default:
+printf("Re-enter your choice");
+goto X;
+}
+EXEC SQL DISCONNECT project;
+return 0;
+}
+
+
+
+
+
+
