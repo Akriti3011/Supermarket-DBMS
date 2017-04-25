@@ -1,0 +1,26 @@
+#include <stdio.h>
+#include <libpq-fe.h>
+
+       EXEC SQL BEGIN DECLARE SECTION;
+    char offer_id[20];
+    int c;
+    EXEC SQL END DECLARE SECTION;
+  
+int main()
+{
+   
+ EXEC SQL CONNECT TO "201552076@10.100.1.62" USER "201552076" USING "201552076";
+
+    EXEC SQL set search_path to walmart;
+     EXEC SQL  select offer_id,max into :offer_id,:c  from
+                      (select offer_id ,sum(quantity) as max from returnslip natural join product group by offer_id) as r2
+                      natural join
+     (select max(sum) as max from (select sum(quantity) as sum,offer_id from returnslip natural join product group by offer_id)
+     as r1) as r3 where r3.max=r2.max;
+   
+ 
+    printf("%s\t %d\n",offer_id,c);
+      
+
+   return 0;
+}

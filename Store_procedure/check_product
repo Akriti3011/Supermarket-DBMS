@@ -1,0 +1,14 @@
+CREATE OR REPLACE FUNCTION walmart.check_product(pid_name text)
+  RETURNS integer AS
+$BODY$
+DECLARE 
+a1 int;
+BEGIN
+SELECT count(product_id) into a1 FROM product WHERE product.Product_ID=pid_name;
+RETURN a1;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION walmart.check_product(text)
+  OWNER TO "201552076";

@@ -1,0 +1,23 @@
+#include <stdio.h>
+#include <libpq-fe.h>
+EXEC SQL BEGIN DECLARE SECTION;
+char product_id [20],product_type [20];
+int warehouse_count,block_count;
+EXEC SQL END DECLARE SECTION;
+int main()
+{
+   
+    EXEC SQL CONNECT TO "201552076@10.100.1.62" USER "201552076" USING "201552076";
+
+    EXEC SQL set search_path to walmart;
+   EXEC SQL DECLARE emp_cur5 CURSOR  FOR  select  p.product_id,p.product_type,p.warehouse_count,p.block_count from returnslip as r join
+                                      Product as p on(r.product_id=p.product_id) where block_count > 0.3 * warehouse_count; 
+ 
+    EXEC SQL OPEN emp_cur5;
+    while(sqlca.sqlcode==0)
+    {
+       EXEC SQL FETCH emp_cur5 INTO :product_id, :product_type, :warehouse_count, :block_count;
+       printf("%s\t %s\t %d\n",product_id,product_type,warehouse_count,block_count);
+    }
+   return 0;
+}

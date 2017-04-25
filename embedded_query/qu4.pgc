@@ -1,0 +1,27 @@
+#include <stdio.h>
+#include <libpq-fe.h>
+EXEC SQL BEGIN DECLARE SECTION;
+char offers_id[20],offers_type[20],offers_details[20];
+ 
+EXEC SQL END DECLARE SECTION;
+int main()
+{
+   
+    EXEC SQL CONNECT TO "201552076@10.100.1.62" USER "201552076" USING "201552076";
+
+    EXEC SQL set search_path to walmart;
+    
+   
+    
+    EXEC SQL DECLARE emp_cur3 CURSOR  FOR select offers_id,offers_type,offers_details from OfferDetails 
+                            where offers_start_date < '2016-12-31' and offers_end_date > '2016-12-31';
+    EXEC SQL OPEN emp_cur3;
+    while(sqlca.sqlcode==0)
+    {
+       EXEC SQL FETCH emp_cur3 INTO :offers_id, :offers_type, :offers_details;
+       printf("%s\t\t   %s\t\t %s\n",offers_id,offers_type,offers_details);
+    }
+   
+   
+    return 0;
+}

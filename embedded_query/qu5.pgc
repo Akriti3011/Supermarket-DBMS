@@ -1,0 +1,30 @@
+#include <stdio.h>
+#include <libpq-fe.h>
+ EXEC SQL BEGIN DECLARE SECTION;
+char employee_name[20],employee_id[20],gender[20];
+EXEC SQL END DECLARE SECTION;
+
+int main()
+{
+   
+  EXEC SQL BEGIN DECLARE SECTION;
+char employee_name[20],employee_id[20],gender[20];
+EXEC SQL END DECLARE SECTION;
+
+    
+    EXEC SQL DECLARE emp_cur4 CURSOR  FOR  select employee_name, employee_id ,gender from (select DISTINCT block_incharge_id from block except
+                                         select DISTINCT  block_incharge_id from (select  DISTINCT store_id from (select distinct category_id from 
+                                         ReturnSlip as rs join Product as p on(rs.product_id=p.product_id))as e join category as
+                                         c on(e.category_id=c.category_id))as f join block as b on (f.store_id=b.block_id))as bl join
+                                         employee as emp  on(bl.block_incharge_id=emp.employee_id);
+ 
+    EXEC SQL OPEN emp_cur4;
+    while(sqlca.sqlcode==0)
+    {
+       EXEC SQL FETCH emp_cur4 INTO :employee_name, :employee_id, :gender;
+       printf("%s\t %s\t %d\n",employee_name,employee_id,gender);
+    }
+
+
+   return 0;
+}

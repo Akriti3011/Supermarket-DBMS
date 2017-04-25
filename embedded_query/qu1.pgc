@@ -1,0 +1,21 @@
+#include <stdio.h>
+#include <libpq-fe.h>
+EXEC SQL BEGIN DECLARE SECTION;
+	int c;
+	EXEC SQL END DECLARE SECTION;
+   
+int main()
+{
+   
+ EXEC SQL CONNECT TO "201552076@10.100.1.62" USER "201552076" USING "201552076";
+
+    EXEC SQL set search_path to walmart;
+    EXEC SQL select count(distinct cust_id) INTO :c from invoicedetails natural join customer natural join customertype 
+where invoicedetails.amount > 2000 and customertype.type_name='Platinum';
+
+     printf("count: %d\n",c);
+    
+}
+
+   return 0;
+}

@@ -1,0 +1,29 @@
+#include <stdio.h>
+#include <libpq-fe.h>
+EXEC SQL BEGIN DECLARE SECTION;
+	char product_id [20],invoice_id [20];
+	int quantity;
+
+	EXEC SQL END DECLARE SECTION;
+    
+int main()
+{
+   
+ EXEC SQL CONNECT TO "201552076@10.100.1.62" USER "201552076" USING "201552076";
+
+    EXEC SQL set search_path to walmart;
+    EXEC SQL DECLARE emp_cur6 CURSOR  FOR select distinct cust_id,type_name from(select DISTINCT cust_id , inv_date ,amount from (select invoice_id ,sum(quantity) from Buys group by invoice_id having sum(quantity)>3 or sum(quantity)=3)
+    as p natural join InvoiceDetails where amount >3000 and inv_date='2015-03-05' )as j natural join Customer as c natural join 
+     CustomerType where CustomerType.type_name='Platinum';
+
+    EXEC SQL OPEN emp_cur6;
+    while(sqlca.sqlcode==0)
+    {
+       EXEC SQL FETCH emp_cur6 INTO :product_id, :invoice_id, :quantity;
+       printf("%s\t %s\t %d\n",product_id,invoice_id,quantity);
+    }
+   
+    
+
+   return 0;
+}

@@ -1,0 +1,24 @@
+#include <stdio.h>
+#include <libpq-fe.h>
+EXEC SQL BEGIN DECLARE SECTION;
+	char product_id [20],invoice_id [20], category_id[20];
+	EXEC SQL END DECLARE SECTION;
+int main()
+{
+   
+    EXEC SQL CONNECT TO "201552076@10.100.1.62" USER "201552076" USING "201552076";
+
+    EXEC SQL set search_path to walmart;
+    
+    EXEC SQL DECLARE emp_cur2 CURSOR  FOR select distinct product_id , product_type,category_id from buys natural join product natural join category where
+    category.warehouse_no like '%002' and
+    product.category_id like 'MF%';
+    EXEC SQL OPEN emp_cur2;
+    while(sqlca.sqlcode==0)
+    {
+       EXEC SQL FETCH emp_cur2 INTO :product_id, :invoice_id, :category_id;
+       printf("%s\t %s\t %s\n",product_id,invoice_id,category_id);
+    }
+   
+    return 0;
+}

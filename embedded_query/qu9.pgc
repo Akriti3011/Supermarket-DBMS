@@ -1,0 +1,28 @@
+#include <stdio.h>
+#include <libpq-fe.h>
+  EXEC SQL BEGIN DECLARE SECTION;
+    char employee_id[20],employee_name[20];
+    EXEC SQL END DECLARE SECTION;
+  
+
+int main()
+{
+   
+    EXEC SQL CONNECT TO "201552076@10.100.1.62" USER "201552076" USING "201552076";
+    
+    EXEC SQL set search_path to walmart;
+
+   
+    EXEC SQL DECLARE emp_cur15 CURSOR  FOR
+select  distinct employee_name,employee_id from employee inner join block on(employee_id=block_incharge_id)
+inner join category on (block_id=store_id) where block_name='Grocery';
+    EXEC SQL OPEN emp_cur15;
+    while(sqlca.sqlcode==0)
+    {
+       EXEC SQL FETCH emp_cur15 INTO :employee_id, :employee_name;
+       printf("%s\t %s\n",employee_id,employee_name);
+    }
+ 
+   
+    return 0;
+}

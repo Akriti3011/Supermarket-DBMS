@@ -1,0 +1,32 @@
+#include <stdio.h>
+#include <libpq-fe.h>
+ EXEC SQL BEGIN DECLARE SECTION;
+	char product_id [20],product1_id [20],product_type[50],brand[20],category_id[6],offer_id[50];
+	int block_count,warehouse_count;
+	int cost_price,weight,selling_price;
+
+
+int main()
+{
+   
+   
+   EXEC SQL CONNECT TO "201552076@10.100.1.62" USER "201552076" USING "201552076";
+
+    EXEC SQL set search_path to walmart;
+ 
+    EXEC SQL DECLARE emp_cur1 CURSOR  FOR   select * from (select DISTINCT product_id from (select inv_id from 
+                          InvoiceDetails as i join PaymentMode as p on (i.payment_mode_id=p.payment_mode_id)
+                          where mode_of_payment='Paytm')as d join Buys as b on(d.inv_id=b.invoice_id)) as s 
+                          join Product as pro on(s.product_id=pro.product_id) where offer_id='KHUSIWALIDIWALI';
+
+    EXEC SQL OPEN emp_cur1;
+    while(sqlca.sqlcode==0)
+    {
+       EXEC SQL FETCH emp_cur1 INTO :product_id, :product1_id, :product_type, :brand, :cost_price,  :weight, :selling_price, :category_id, :offer_id,    :block_count, :warehouse_count;
+ 
+       printf("%s\t %s\t %s\t %s\t %d\t %d\t %d\t %s\t %s\t %d\t %d\n",product_id,product1_id,product_type,brand,cost_price,weight, selling_price,category_id,offer_id,block_count,warehouse_count);
+    }
+   
+
+    return 0;
+}

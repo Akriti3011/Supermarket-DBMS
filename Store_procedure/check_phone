@@ -1,0 +1,15 @@
+CREATE OR REPLACE FUNCTION walmart.check_phn(phn integer)
+  RETURNS integer AS
+$BODY$
+DECLARE 
+a1 int;
+BEGIN
+SELECT count(customer_contact) into a1 FROM Customer WHERE Customer.Customer_contact=phn;
+RETURN a1;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION walmart.check_phn(integer)
+  OWNER TO "201552076";
+
